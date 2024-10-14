@@ -1,5 +1,5 @@
-# Lazykitty
-Lazykitty - A Chess engine written in C (wip)
+# workshy
+workshy - A unit testing/benchmarking suite for C
 
 ## Building
 

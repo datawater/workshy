@@ -9,11 +9,14 @@ CFLAGS += -L$(WORKSHY_PATH) -L./ -L../
 main: check_error run_tests
 
 .PHONY: run_tests
-run_tests: compile_tests
+run_tests: libworkshy.a compile_tests
 
 .PHONY: compile_tests
 compile_tests: libtests.a
 	$(CC) $(CFLAGS) $^ -o run_tests -lworkshy -ltests $(LIBS)
+
+libworkshy.a:
+	make -C ../
 
 libtests.a: $(TEST_OBJECT_FILES)
 	ar -crs $@ $^

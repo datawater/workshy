@@ -12,6 +12,7 @@ extern "C" {
 #include <stddef.h>
 
 #include "register.h"
+#include "workshy_macros.h"
 
 result_t new_result(void);
 result_t new_result_error(char* error);

@@ -6,7 +6,6 @@
 
 #include "console.h"
 #include "register.h"
-#include "run_utils.h"
 
 #include <pthread.h>
 #include <stdlib.h>
@@ -16,15 +15,14 @@
 bool __workshy_run_test(__workshy_test_function_ptr function, char* function_name, int i) {
     printf("Test N%d %s: ", i, function_name);
 
-    __workshy_block_stdout();
-    __workshy_block_stderr();
+    // TOOD: figure out a way to block each threads stderr/stdout instead of just not blocking
+    // __workshy_block_stdout();
+    // __workshy_block_stderr();
 
-    // TODO: workshy: refactor test running to fork the main process and call
-    // the test function from there, instead of raw-calling
     result_t result = function();
 
-    __workshy_unblock_stdout();
-    __workshy_unblock_stderr();
+    // __workshy_unblock_stdout();
+    // __workshy_unblock_stderr();
 
     if (result.result == fail) {
         printf(ANSI_COLOR_RED "failed\n" ANSI_COLOR_RESET);
@@ -67,15 +65,18 @@ void __workshy_run_tests(unsigned short threads_count) {
     pthread_t* threads = (pthread_t*) malloc(sizeof(pthread_t) * threads_count);
     memset(threads, 0, sizeof(pthread_t) * threads_count);
 
-    int test_amount_floored = tests_amount % threads_count;
-    int each_test = (tests_amount - test_amount_floored) / threads_count;
+    int each_test = (tests_amount - tests_amount % threads_count) / threads_count;
     for (int t = 0; t < threads_count; t++) {
         int start = t * threads_count;
-        int end = start + threads_count + (!(t == threads_count - 1)) * (tests_amount - test_amount_floored);
+        int end = start + each_test;
+        if (t == threads_count - 1)
+            end = tests_amount;
 
         struct run_test_args args = (struct run_test_args) {
             start, end
         };
+
+        printf("T%d: %d..%d\n", t, start, end);
 
         int result_code = pthread_create(&threads[t], NULL, run_test_pthread, &args);
         if (result_code != 0) {

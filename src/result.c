@@ -1,12 +1,13 @@
-#include "workshy.h"
-#include <stdlib.h>
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
+
+#include "workshy.h"
 
 result_t new_result() {
     char* error = malloc(sizeof(char) * 256);
     assert(error != NULL);
-    
+
     memset(error, 0, sizeof(char) * 256);
 
     result_t result = {0};
@@ -19,8 +20,7 @@ result_t new_result() {
 result_t new_result_error(char* error) {
     result_t result = new_result();
 
-    if (error != NULL)
-        result.error = error;
+    if (error != NULL) result.error = error;
 
     result.result = fail;
     return result;
@@ -34,9 +34,7 @@ result_t new_result_ok() {
 }
 
 const char* workshy_result_to_string(result_e result) {
-    static const char* result_to_string[] = {
-        "ok", "error"
-    };
+    static const char* result_to_string[] = {"ok", "error"};
 
     return result_to_string[result];
 }

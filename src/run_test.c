@@ -1,6 +1,7 @@
 #include "run.h"
 
 #include <assert.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -12,10 +13,25 @@
 #include <string.h>
 #include <errno.h>
 
-bool __workshy_run_test(__workshy_test_function_ptr function, char* function_name, int i) {
-    printf("Test N%d %s: ", i, function_name);
+// #include "run_utils.h"
 
-    // TOOD: figure out a way to block each threads stderr/stdout instead of just not blocking
+static pthread_mutex_t printf_mutex;
+
+int sync_printf(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+
+    pthread_mutex_lock(&printf_mutex);
+    int x = vprintf(format, args);
+    pthread_mutex_unlock(&printf_mutex);
+
+    va_end(args);
+
+    return x;
+}
+
+bool __workshy_run_test(__workshy_test_function_ptr function, char* function_name, int i) {
+    // TODO: figure out a way to block each threads stderr/stdout instead of just not blocking
     // __workshy_block_stdout();
     // __workshy_block_stderr();
 
@@ -25,11 +41,11 @@ bool __workshy_run_test(__workshy_test_function_ptr function, char* function_nam
     // __workshy_unblock_stderr();
 
     if (result.result == fail) {
-        printf(ANSI_COLOR_RED "failed\n" ANSI_COLOR_RESET);
+        sync_printf("Test N%d %s: "ANSI_COLOR_RED "failed\n" ANSI_COLOR_RESET, i + 1, function_name);
 
-        if (result.error != NULL) printf("Fail error string: %s\n\n", result.error);
+        if (result.error != NULL) sync_printf("Fail error string: %s\n\n", result.error);
     } else {
-        printf(ANSI_COLOR_GREEN "passed\n" ANSI_COLOR_RESET);
+        sync_printf("Test N%d %s: "ANSI_COLOR_GREEN "passed\n" ANSI_COLOR_RESET, i + 1, function_name);
         return true;
     }
 
@@ -48,6 +64,7 @@ void* run_test_pthread(void* args) {
     __workshy_test_function_ptr* test_function_list = __workshy_get_test_functions();
 
     struct run_test_args fargs = *((struct run_test_args*) args);
+
     for (int i = fargs.start; i < fargs.end; i++) {
         passed += __workshy_run_test(test_function_list[i], test_function_name_list[i], i);
     }
@@ -60,25 +77,28 @@ void __workshy_run_tests(unsigned short threads_count) {
     char** test_function_name_list = __workshy_get_test_function_names();
     __workshy_test_function_ptr* test_function_list = __workshy_get_test_functions();
 
-    printf(ANSI_COLOR_CYAN "[INFO]" ANSI_COLOR_RESET " Amount of tests: %d\n\n", tests_amount);
+    pthread_mutex_init(&printf_mutex, NULL);
 
     pthread_t* threads = (pthread_t*) malloc(sizeof(pthread_t) * threads_count);
+    struct run_test_args* args = (struct run_test_args*) malloc(sizeof(struct run_test_args*) * threads_count);
+
     memset(threads, 0, sizeof(pthread_t) * threads_count);
+    memset(args, 0, sizeof(struct run_test_args) * threads_count);
 
     int each_test = (tests_amount - tests_amount % threads_count) / threads_count;
     for (int t = 0; t < threads_count; t++) {
-        int start = t * threads_count;
+        int start = t * each_test;
         int end = start + each_test;
         if (t == threads_count - 1)
             end = tests_amount;
 
-        struct run_test_args args = (struct run_test_args) {
+        struct run_test_args arg = (struct run_test_args) {
             start, end
         };
 
-        printf("T%d: %d..%d\n", t, start, end);
+        args[t] = arg;
 
-        int result_code = pthread_create(&threads[t], NULL, run_test_pthread, &args);
+        int result_code = pthread_create(&threads[t], NULL, run_test_pthread, &args[t]);
         if (result_code != 0) {
             errno = result_code;
             fprintf(stderr, "[workshy_fail] couldn't spawn testing thread. error: %s\n", strerror(errno));
@@ -105,4 +125,6 @@ void __workshy_run_tests(unsigned short threads_count) {
         printf(ANSI_COLOR_RED "[FAIL]" ANSI_COLOR_RESET " Failed " ANSI_COLOR_RED "%d" ANSI_COLOR_RESET
                               " test(s). :(\n",
                tests_amount - passed);
+
+    pthread_mutex_destroy(&printf_mutex);
 }

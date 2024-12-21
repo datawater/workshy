@@ -2,7 +2,7 @@ CFLAGS_WARNINGS = -Wall -Wextra -Werror -pedantic -Wstrict-aliasing -Wno-pointer
 CFLAGS = $(CFLAGS_WARNINGS) -std=gnu11
 LIBS =
 
-GLIBC_VERSION := $(shell getconf GNU_LIBC_VERSION | tail -c +7)
+GLIBC_VERSION := $(shell getconf GNU_LIBC_VERSION 2> /dev/null | tail -c +7)
 LRT_REQUIRED_VERSION := 2.17
 LRT_IS_REQUIRED := $(shell printf "%s\n" $(LRT_REQUIRED_VERSION) $(GLIBC_VERSION) | sort | head -n1)
 

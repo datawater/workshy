@@ -9,14 +9,19 @@
 static int __workshy_stdout;
 static int __workshy_stderr;
 
+#if defined(_WIN32)
+    #define __WORKSHY_DEV_NULL "nul"
+#elif defined(__unix__)
+    #define __WORKSHY_DEV_NULL "/dev/null"
+#endif
+
 void swap_with_dev_null(int x, int* x_backup) {
     (void) x_backup;
 
-    // TODO: workshy: think of an another way of to block std(out/err), get rid of /dev/null
-    int dev_null = open("/dev/null", O_WRONLY);
+    int dev_null = open(__WORKSHY_DEV_NULL, O_WRONLY);
 
     if (dev_null == -1) {
-        fprintf(stderr, "[workshy_err] Couldn't open '/dev/null'. error: %s\n", strerror(errno));
+        fprintf(stderr, "[workshy_err] Couldn't open '"__WORKSHY_DEV_NULL"'. error: %s\n", strerror(errno));
         abort();
     }
 

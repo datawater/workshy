@@ -8,8 +8,7 @@
 #include "register.h"
 #include "run_utils.h"
 
-bool __workshy_run_test(__workshy_test_function_ptr function,
-                        char* function_name, int i) {
+bool __workshy_run_test(__workshy_test_function_ptr function, char* function_name, int i) {
     printf("Test N%d %s: ", i, function_name);
 
     __workshy_block_stdout();
@@ -25,8 +24,7 @@ bool __workshy_run_test(__workshy_test_function_ptr function,
     if (result.result == fail) {
         printf(ANSI_COLOR_RED "failed\n" ANSI_COLOR_RESET);
 
-        if (result.error != NULL)
-            printf("Fail error string: %s\n\n", result.error);
+        if (result.error != NULL) printf("Fail error string: %s\n\n", result.error);
     } else {
         printf(ANSI_COLOR_GREEN "passed\n" ANSI_COLOR_RESET);
         return true;
@@ -35,31 +33,26 @@ bool __workshy_run_test(__workshy_test_function_ptr function,
     return false;
 }
 
-void __workshy_run_tests() {
+void __workshy_run_tests(unsigned short threads) {
     int tests_amount = *__workshy_get_test_amount();
     char** test_function_name_list = __workshy_get_test_function_names();
-    __workshy_test_function_ptr* test_function_list =
-        __workshy_get_test_functions();
+    __workshy_test_function_ptr* test_function_list = __workshy_get_test_functions();
 
     int passed = 0;
 
-    printf(ANSI_COLOR_CYAN "[INFO]" ANSI_COLOR_RESET " Amount of tests: %d\n\n",
-           tests_amount);
+    printf(ANSI_COLOR_CYAN "[INFO]" ANSI_COLOR_RESET " Amount of tests: %d\n\n", tests_amount);
 
     // TODO: workshy: Allow multi-threaded testing
+    (void)threads;
     for (int i = 0; i < tests_amount; ++i)
-        passed += __workshy_run_test(test_function_list[i],
-                                     test_function_name_list[i], i);
+        passed += __workshy_run_test(test_function_list[i], test_function_name_list[i], i);
 
-    printf(ANSI_COLOR_CYAN "\n[INFO]" ANSI_COLOR_RESET " Passed: %d/%d\n",
-           passed, tests_amount);
+    printf(ANSI_COLOR_CYAN "\n[INFO]" ANSI_COLOR_RESET " Passed: %d/%d\n", passed, tests_amount);
 
     if (passed == tests_amount)
-        printf(ANSI_COLOR_GREEN "[SUCCESS]" ANSI_COLOR_RESET
-                                " All tests passed! :)\n");
+        printf(ANSI_COLOR_GREEN "[SUCCESS]" ANSI_COLOR_RESET " All tests passed! :)\n");
     else
-        printf(ANSI_COLOR_RED "[FAIL]" ANSI_COLOR_RESET
-                              " Failed " ANSI_COLOR_RED "%d" ANSI_COLOR_RESET
+        printf(ANSI_COLOR_RED "[FAIL]" ANSI_COLOR_RESET " Failed " ANSI_COLOR_RED "%d" ANSI_COLOR_RESET
                               " test(s). :(\n",
                tests_amount - passed);
 }

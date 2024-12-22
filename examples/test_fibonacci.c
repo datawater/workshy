@@ -38,6 +38,6 @@ result_t test_fibonacci_fast_double(void) {
         unsigned long long f_n = nth_fibonacci_number_fast_double(i);
         FIBONACCI_ASSERT(f_n == first_10[i], i, first_10[i], f_n);
     }
-    
+
     return new_result_ok();
 }

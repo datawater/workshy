@@ -12,5 +12,5 @@ static ull nth_fibonacci_number(int n) {
     return nth_fibonacci_number_linear(n);
 #else
     return nth_fibonacci_number_fast_double(n);
-#endif // SLOW
+#endif  // SLOW
 }

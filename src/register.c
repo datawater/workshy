@@ -16,48 +16,48 @@ char** workshy_benchmark_function_name_list;
 static int workshy_benchmark_amount;
 static int __workshy_benchmark_array_capacity;
 
+#define SAFE_MALLOC(ptr, size, type)                           \
+    do {                                                       \
+        ptr = (type*)malloc(sizeof(type) * (size));            \
+        memset((ptr), 0, sizeof(type) * (size));               \
+        assert((ptr) != NULL && "couldn't allocate memory\n"); \
+    } while (0);
+
+#define SAFE_REALLOC(ptr, capacity, type, delta)               \
+    do {                                                       \
+        capacity = (int)(((float)(capacity)) * (delta));       \
+        (ptr) = (type*)realloc((ptr), (capacity));             \
+        assert((ptr) != NULL && "couldn't allocate memory\n"); \
+    } while (0);
+
+#define PHI 1.618033988
+#define NO_INCREASE 1.0
+
 void safe_check_array_pointers() {
     if (workshy_tests_list == NULL) {
-        workshy_tests_list = malloc(sizeof(__workshy_test_function_ptr) * WORKSHY_DEFAULT_AMOUNT_OF_TESTS);
-        memset(workshy_tests_list, 0, sizeof(char*) * WORKSHY_DEFAULT_AMOUNT_OF_TESTS);
-        assert(workshy_tests_list != NULL && "couldn't allocate memory\n");
+        SAFE_MALLOC(workshy_tests_list, WORKSHY_DEFAULT_AMOUNT_OF_TESTS, __workshy_test_function_ptr)
     }
 
     if (workshy_test_function_name_list == NULL) {
-        workshy_test_function_name_list = malloc(sizeof(char*) * WORKSHY_DEFAULT_AMOUNT_OF_TESTS);
-        memset(workshy_test_function_name_list, 0, sizeof(char*) * WORKSHY_DEFAULT_AMOUNT_OF_TESTS);
-        assert(workshy_test_function_name_list != NULL && "couldn't allocate memory\n");
+        SAFE_MALLOC(workshy_test_function_name_list, WORKSHY_DEFAULT_AMOUNT_OF_TESTS, char*);
     }
 
     if (workshy_tests_amount + 1 == __workshy_tests_array_capacity) {
-        __workshy_tests_array_capacity *= 1.6;
-        workshy_tests_list = realloc(workshy_tests_list, __workshy_tests_array_capacity);
-        workshy_test_function_name_list = realloc(workshy_test_function_name_list, __workshy_tests_array_capacity);
-
-        assert(workshy_tests_list != NULL && workshy_test_function_name_list != NULL && "couldn't allocate memory\n");
+        SAFE_REALLOC(workshy_tests_list, __workshy_tests_array_capacity, __workshy_test_function_ptr, PHI);
+        SAFE_REALLOC(workshy_test_function_name_list, __workshy_tests_array_capacity, char*, NO_INCREASE);
     }
 
     if (workshy_benchmark_list == NULL) {
-        workshy_benchmark_list =
-            malloc(sizeof(__workshy_benchmark_function_ptr) * WORKSHY_DEFAULT_AMOUNT_OF_BENCHMARKS);
-        memset(workshy_benchmark_list, 0, sizeof(char*) * WORKSHY_DEFAULT_AMOUNT_OF_BENCHMARKS);
-        assert(workshy_benchmark_list != NULL && "couldn't allocate memory\n");
+        SAFE_MALLOC(workshy_benchmark_list, WORKSHY_DEFAULT_AMOUNT_OF_BENCHMARKS, __workshy_benchmark_function_ptr)
     }
 
     if (workshy_benchmark_function_name_list == NULL) {
-        workshy_benchmark_function_name_list = malloc(sizeof(char*) * WORKSHY_DEFAULT_AMOUNT_OF_BENCHMARKS);
-        memset(workshy_benchmark_function_name_list, 0, sizeof(char*) * WORKSHY_DEFAULT_AMOUNT_OF_BENCHMARKS);
-        assert(workshy_benchmark_function_name_list != NULL && "couldn't allocate memory\n");
+        SAFE_MALLOC(workshy_benchmark_function_name_list, WORKSHY_DEFAULT_AMOUNT_OF_BENCHMARKS, char*);
     }
 
     if (workshy_benchmark_amount + 1 == __workshy_benchmark_array_capacity) {
-        __workshy_benchmark_array_capacity *= 1.6;
-        workshy_benchmark_list = realloc(workshy_benchmark_list, __workshy_benchmark_array_capacity);
-        workshy_benchmark_function_name_list =
-            realloc(workshy_benchmark_function_name_list, __workshy_benchmark_array_capacity);
-
-        assert(workshy_benchmark_list != NULL && workshy_benchmark_function_name_list != NULL &&
-               "couldn't allocate memory\n");
+        SAFE_REALLOC(workshy_benchmark_list, __workshy_benchmark_array_capacity, __workshy_benchmark_function_ptr, PHI);
+        SAFE_REALLOC(workshy_benchmark_function_name_list, __workshy_benchmark_array_capacity, char*, NO_INCREASE);
     }
 }
 

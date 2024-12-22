@@ -8,7 +8,7 @@
 #define WORKSHY_DEFAULT_AMOUNT_OF_BENCHMARKS 128
 #endif  // WORKSHY_DEFAULT_AMOUNT_OF_TESTS
 
-#define __workshy_benchmark_samples_amount 100
+#define __workshy_benchmark_samples_amount 20
 
 #define CONCAT_1(x, y) x##y
 #define CONCAT_2(x, y) CONCAT_1(x, y)

@@ -1,20 +1,16 @@
 #pragma once
 
-static unsigned long long nth_fibonacci_number(int n) {
-    unsigned long long a, b, c;
-    a = 0;
-    b = 1;
-    c = 1;
+typedef unsigned long long ull;
 
-    if (n == 0) return n;
-    if (n == 1) return b;
-    if (n == 2) return c;
+ull nth_fibonacci_number_linear(int n);
+ull nth_fibonacci_number_fast_double(int n);
 
-    for (int i = 0; i < n - 1; i++) {
-        c = a + b;
-        a = b;
-        b = c;
-    }
+// #define SLOW
 
-    return c;
+static ull nth_fibonacci_number(int n) {
+#ifdef SLOW
+    return nth_fibonacci_number_linear(n);
+#else
+    return nth_fibonacci_number_fast_double(n);
+#endif // SLOW
 }

@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,13 +47,13 @@ int warm_up_bench(__workshy_benchmark_function_ptr function) {
 
 long double time_function(__workshy_benchmark_function_ptr function) {
     struct timespec start, end;
-    long long seconds, nanoseconds;
+    int64_t seconds, nanoseconds;
 
-    clock_gettime(CLOCK_MONOTONIC, &start);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
     function();
 
-    clock_gettime(CLOCK_MONOTONIC, &end);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
 
     seconds = end.tv_sec - start.tv_sec;
     nanoseconds = end.tv_nsec - start.tv_nsec;
@@ -108,7 +109,7 @@ void __workshy_run_bench(__workshy_benchmark_function_ptr function, char* functi
 
     average /= __workshy_benchmark_samples_amount;
 
-    printf("average time taken: %Lfs\n\n", average);
+    printf("average time taken: %Les\n\n", average);
 }
 
 void __workshy_run_benches() {

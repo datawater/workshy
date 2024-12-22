@@ -3,7 +3,7 @@ include ../config.mk
 TEST_SOURCE_FILES = $(wildcard ./*.c)
 TEST_OBJECT_FILES = $(patsubst %.c,%.o,$(TEST_SOURCE_FILES))
 WORKSHY_PATH = ../workshy -Wno-unused-variable
-CFLAGS += -L$(WORKSHY_PATH) -L./ -L../
+CFLAGS += -L$(WORKSHY_PATH) -L./ -L../ -Wno-unused-function
 
 .PHONY: main
 main: check_error run_tests

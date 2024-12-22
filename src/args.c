@@ -91,6 +91,9 @@ __workshy_args __workshy_args_from_array(char** argv, int argc) {
 
             goto end;
         }
+
+        fprintf(stderr, "[workshy_fail] invalid arguments: `%s`. run `workshy --help` for help.\n", argv[i]);
+        exit(1);
     }
 
 end:

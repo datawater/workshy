@@ -98,13 +98,9 @@ void __workshy__register_benchmark(__workshy_benchmark_function_ptr test_functio
 }
 
 __workshy_test_function_ptr* __workshy_get_test_functions() { return workshy_tests_list; }
-
 char** __workshy_get_test_function_names() { return workshy_test_function_name_list; }
-
 int* __workshy_get_test_amount() { return (int*)&workshy_tests_amount; }
 
 __workshy_benchmark_function_ptr* __workshy_get_benchmark_functions() { return workshy_benchmark_list; }
-
 char** __workshy_get_benchmark_function_names() { return workshy_benchmark_function_name_list; }
-
 int* __workshy_get_benchmark_amount() { return (int*)&workshy_benchmark_amount; }

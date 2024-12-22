@@ -1,0 +1,43 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build
+      run: make build
+    - name: Test
+      run: make test
+
+jobs:
+  example_matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: build
+      run: make
+    - name: build tests
+      run: make test
+    - name: run tests
+      run: ./examples/run_tests
+    
+    - name: clean
+      run: make clean
+    
+    - name: build (release)
+      run: make PROFILE=release
+    - name: build tests (release)
+      run: make PROFILE=release test
+    - name: run tests (release)
+      run: ./examples/run_tests
